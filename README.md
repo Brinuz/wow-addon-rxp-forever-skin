@@ -2,6 +2,8 @@
 
 Makes the **RestedXP Guides** window on **World of Warcraft: Forever** look like Blizzard's own windows. Built entirely from Blizzard's own UI.
 
+<img src="docs/screenshot.png" alt="The RestedXP guide window with the skin: Current Steps with Active Targets docked, and the step list with finished steps checked" width="400">
+
 ## Features
 
 - Blizzard's window frame and gold title, with the guide name in the title strip
