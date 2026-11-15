@@ -7,6 +7,10 @@ local ART = ns.ART
 
 -- ChatConfigCheckButtonTemplate's own textures, which RestedXP replaces.
 local CHECK_ART = "Interface\\Buttons\\UI-CheckBox-"
+-- RestedXP's check boxes are 12px; as big as they go before the boxes of
+-- two one-line goals touch. Its quest icon and the text follow them.
+local CHECK_SIZE, CHECK_X, CHECK_Y = 16, 4, 1
+local ICON_X, TEXT_X, TEXT_Y = CHECK_X + CHECK_SIZE, 31, -2
 
 -- How far the active steps' frame reaches past the steps (the sides only for
 -- a floating tip). At the top: the title strip, plus RestedXP's step title
@@ -157,11 +161,18 @@ function ns:StyleRows(caller, stepIndex)
 end
 
 -- ---------------------------------------------------------------- active steps
+-- RestedXP places these on every steps update, just before this runs:
+-- the box at the goal's top left, its icon and text right of the box.
 local function StyleElement(element)
 	local button = element.button
 	button:SetNormalTexture(CHECK_ART .. "Up")
 	button:SetCheckedTexture(CHECK_ART .. "Check")
 	button:SetDisabledCheckedTexture(CHECK_ART .. "Check-Disabled")
+	button:SetSize(CHECK_SIZE, CHECK_SIZE)
+	-- Centered on the first line of text, as RestedXP's smaller box was.
+	button:SetPoint("TOPLEFT", element, "TOPLEFT", CHECK_X, CHECK_Y)
+	element.icon:SetPoint("TOPLEFT", element, "TOPLEFT", ICON_X, TEXT_Y + 1)
+	element.text:SetPoint("TOPLEFT", element, "TOPLEFT", TEXT_X, TEXT_Y)
 	element.text:SetTextColor(HIGHLIGHT_FONT_COLOR:GetRGB())
 end
 
@@ -215,6 +226,10 @@ function ns:StyleActiveSteps()
 	ns:LayoutTargets()
 end
 
+-- Empty space added under short steps, so the frame is tall enough for its
+-- corners. Above the window the steps move up by it (the SetPoint hook).
+local padBelow = 0
+
 -- Also called by Targets.lua: with active targets docked under the steps
 -- the frame reaches down to them.
 function ns:AnchorStepsChrome()
@@ -222,12 +237,23 @@ function ns:AnchorStepsChrome()
 	local window = ns.RXPFrame
 	local chrome = ns:GetChrome(stepsFrame, ns.L.ACTIVE_TITLE)
 	local targets = ns:GetTargetsExtent()
+	local height = MARGIN_TOP + stepsFrame:GetHeight() + targets + MARGIN_BOTTOM
+	local pad = math.max(0, ns.MIN_CHROME_HEIGHT - height)
 	chrome:ClearAllPoints()
 	chrome:SetPoint("TOP", stepsFrame, "TOP", 0, MARGIN_TOP)
-	chrome:SetPoint("BOTTOM", stepsFrame, "BOTTOM", 0, -(targets + MARGIN_BOTTOM))
+	chrome:SetPoint("BOTTOM", stepsFrame, "BOTTOM", 0, -(targets + MARGIN_BOTTOM + pad))
 	chrome:SetPoint("LEFT", window, "LEFT")
 	chrome:SetPoint("RIGHT", window, "RIGHT")
 	chrome:SetShown(targets > 0 or HasVisibleSteps(stepsFrame))
+
+	-- Above the window, have RestedXP place the steps again with the new
+	-- room (only when it changed; this runs on every steps update).
+	if math.abs(pad - padBelow) > 0.5 then
+		padBelow = pad
+		if stepsFrame.anchor == "TOP" and window.SetStepFrameAnchor and stepsFrame:GetTop() then
+			window.SetStepFrameAnchor()
+		end
+	end
 end
 
 -- RestedXP anchors the active steps flush against the window (below it, or
@@ -240,7 +266,7 @@ function ns:HookActiveSteps()
 	hooksecurefunc(stepsFrame, "SetPoint", function(self, point, relativeTo, relativePoint, x, y)
 		if moving or not ns:IsActive() or type(relativeTo) ~= "table" then return end
 		local below = point:find("^TOP") ~= nil
-		local dy = below and -GAP_BELOW or GAP_ABOVE + ns:TargetsRoomAbove()
+		local dy = below and -GAP_BELOW or GAP_ABOVE + ns:TargetsRoomAbove() + padBelow
 		local dx = point:find("LEFT$") and PADDING_SIDE or point:find("RIGHT$") and -PADDING_SIDE or 0
 		moving = true
 		self:SetPoint(point, relativeTo, relativePoint, (x or 0) + dx, (y or 0) + dy)

@@ -13,6 +13,7 @@ Makes the **RestedXP Guides** window on **World of Warcraft: Forever** look like
 - Active Targets docked as a row at the bottom of Current Steps, with action button art
 - The waypoint arrow in Blizzard gold, with the step's main line between the step number and the distance
 - Blizzard's thin scroll bar and settings icon
+- A close button (same as `/rxp hide`) and a button to scroll the list back to the current step
 - RestedXP's settings and theme are never changed; turn the skin off anytime
 
 Styles RestedXP's standard guide window. If RestedXP's V2 interface is turned on, the skin stays out of the way.

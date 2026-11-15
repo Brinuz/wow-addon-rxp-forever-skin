@@ -14,6 +14,7 @@ ns.L = {
 	WELCOME_TITLE = "RestedXP Guides",
 	ACTIVE_TITLE = "Current Steps",
 	TIP_TITLE = "Tip",
+	JUMP_TO_CURRENT = "Go to the current step",
 	ENABLED = "Blizzard style",
 	ENABLED_TOOLTIP = "Draw the RestedXP guide window with Blizzard's window frame, fonts and colors.",
 	ENABLED_ON = "Blizzard style on.",

@@ -36,6 +36,29 @@ end
 -- The window frame spans RestedXP's guide name (now the title strip) down
 -- to the bottom of the window. Parented to the step list, which RestedXP's
 -- V2 interface hides, so the chrome goes away with it.
+-- RestedXP has no close button; it hides from its minimap button or with
+-- "/rxp hide", which also turns off its "shown" setting (hiding the frame
+-- directly would only last until its next update). Run that command.
+local function HideGuide()
+	local rxpCommand = SlashCmdList.ACECONSOLE_RXP
+	if rxpCommand then
+		PlaySound(SOUNDKIT.IG_CHARACTER_INFO_CLOSE)
+		rxpCommand("hide")
+	end
+end
+
+local function StyleCloseButton(chrome)
+	if chrome.RFSClose then return end
+	-- Its OnLoad places it on the corner; scaled with the thinner frame art,
+	-- its offsets scale too, so it stays there.
+	local close = CreateFrame("Button", nil, chrome, "UIPanelCloseButtonDefaultAnchors")
+	close:SetScale(ns.BORDER_SCALE)
+	-- Above the guide name, which takes the title strip's clicks.
+	close:SetFrameLevel(ns.RXPFrame.GuideName:GetFrameLevel() + 5)
+	close:SetScript("OnClick", HideGuide)
+	chrome.RFSClose = close
+end
+
 local function StyleChrome()
 	local frame = ns.RXPFrame
 	local guideName, bottom = frame.GuideName, frame.BottomFrame
@@ -44,6 +67,7 @@ local function StyleChrome()
 	chrome:SetPoint("TOPLEFT", guideName, "TOPLEFT")
 	chrome:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT")
 	chrome:Show()
+	StyleCloseButton(chrome)
 
 	-- RestedXP's 35px banner sits over the list's top edge; make it the
 	-- title strip above the list instead. Its mouse handlers (drag, right
@@ -53,6 +77,45 @@ local function StyleChrome()
 	guideName:SetPoint("BOTTOMLEFT", bottom, "TOPLEFT", -3, 0)
 	guideName:SetPoint("BOTTOMRIGHT", bottom, "TOPRIGHT", 3, 0)
 	UpdateTitle()
+end
+
+-- The step to return to: the first one RestedXP has active, skipping
+-- sticky steps (they stay active from earlier in the guide).
+local function CurrentStepIndex()
+	local fallback
+	for _, row in ipairs(ns.RXPFrame.ScrollChild.framePool) do
+		local step = row.step
+		if step and step.active then
+			if not step.sticky then return step.index end
+			fallback = fallback or step.index
+		end
+	end
+	return fallback
+end
+
+-- Scrolls the list to the current step, as RestedXP does when a step
+-- changes. Same art and size as the chat window's "scroll to bottom".
+local function StyleJumpButton(footer)
+	if footer.RFSJump then return end
+	local jump = CreateFrame("Button", nil, footer)
+	jump:SetSize(17, 15)
+	jump:SetPoint("RIGHT", footer.icon, "LEFT", -4, 0)
+	jump:SetNormalAtlas("minimal-scrollbar-arrow-returntobottom")
+	jump:SetPushedAtlas("minimal-scrollbar-arrow-returntobottom-down")
+	jump:SetHighlightAtlas("minimal-scrollbar-arrow-returntobottom-over")
+	jump:SetScript("OnClick", function()
+		local index = CurrentStepIndex()
+		if index then
+			ns.RXPFrame.BottomFrame:StepScroll(index)
+		end
+	end)
+	jump:SetScript("OnEnter", function(self)
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+		GameTooltip_SetTitle(GameTooltip, ns.L.JUMP_TO_CURRENT)
+		GameTooltip:Show()
+	end)
+	jump:SetScript("OnLeave", GameTooltip_Hide)
+	footer.RFSJump = jump
 end
 
 local function StyleFooter()
@@ -66,6 +129,8 @@ local function StyleFooter()
 	cog:SetNormalAtlas(SETTINGS_ATLAS)
 	cog:SetHighlightAtlas(SETTINGS_ATLAS, "ADD")
 	cog:GetHighlightTexture():SetAlpha(0.4)
+
+	StyleJumpButton(footer)
 
 	if not footer.RFSDivider then
 		footer.RFSDivider = footer:CreateTexture(nil, "ARTWORK")
