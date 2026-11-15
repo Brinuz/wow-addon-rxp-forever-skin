@@ -8,7 +8,14 @@ ns.ART = {
 	HOVER = "Professions_Recipe_Hover",
 }
 
--- Blizzard's title strip is 21px; the background starts below it.
+-- The metal frame art is drawn at this size: thinner edges, corners and
+-- title bar than Blizzard's own windows, the windows themselves unchanged.
+local BORDER_SCALE = 0.85
+
+-- Blizzard's title strip is 21px (the background starts below it) and the
+-- background sits 2px inside the edges, both at full size.
+local TITLE_STRIP, BG_INSET, TITLE_TEXT_Y = 21, 2, -5
+
 ns.TITLE_HEIGHT = 22
 
 -- A Blizzard window behind `parent`, stored as parent.RFSChrome. Anchoring
@@ -20,6 +27,13 @@ function ns:GetChrome(parent, title)
 		-- Same call ProfessionsMixin:OverrideArt makes for the Professions window.
 		SetTextureWithAddressModeOptions(chrome.Bg, "Profession-Background-Overview")
 		chrome.TitleContainer:SetFrameLevel(chrome:GetFrameLevel() + 10)
+		-- The nine-slice fills the chrome whatever its scale; its pieces
+		-- shrink. Move the background and title in to match.
+		chrome.NineSlice:SetScale(BORDER_SCALE)
+		chrome.Bg:ClearAllPoints()
+		chrome.Bg:SetPoint("TOPLEFT", BG_INSET * BORDER_SCALE, -TITLE_STRIP * BORDER_SCALE)
+		chrome.Bg:SetPoint("BOTTOMRIGHT", -BG_INSET * BORDER_SCALE, BG_INSET * BORDER_SCALE)
+		chrome.TitleContainer.TitleText:SetPoint("TOP", 0, TITLE_TEXT_Y * BORDER_SCALE)
 		chrome.TitleContainer.TitleText:SetText(title)
 		parent.RFSChrome = chrome
 	end
