@@ -1,0 +1,21 @@
+## Interface: 16001
+## Title: RestedXP Forever Skin
+## Notes: Restyles the RestedXP guide window to look like Blizzard's own windows.
+## Category: User Interface
+## IconAtlas: Professions-Slot-Frame
+## Author: brinuz
+## Version: 0.1.0
+## Dependencies: RXPGuides
+## SavedVariables: RXPForeverSkinDB
+## X-License: GPL-3.0-or-later
+
+# Files load in this order, each receiving (addonName, ns) as its `...`.
+# Core first: it creates the shared table, the saved settings and the events.
+Core.lua
+Chrome.xml
+Chrome.lua
+Window.lua
+Steps.lua
+Targets.lua
+Arrow.lua
+Settings.lua

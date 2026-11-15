@@ -1,0 +1,49 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+
+	<!--
+	The Blizzard window drawn behind RestedXP's frames, built like Forever's Professions
+	window: PortraitFrameTexturedBaseTemplate without the portrait, its background
+	swapped for Profession-Background-Overview (Chrome.lua, as ProfessionsMixin:OverrideArt
+	does), the metal nine-slice of ButtonFrameTemplateNoPortrait and a gold title.
+	Placed at its parent's frame level, so RestedXP's own frames sit on top.
+	-->
+	<Frame name="RXPForeverSkinChromeTemplate" useParentLevel="true" virtual="true">
+		<KeyValues>
+			<KeyValue key="layoutType" value="ButtonFrameTemplateNoPortrait" type="string"/>
+		</KeyValues>
+		<Layers>
+			<Layer level="BACKGROUND" textureSubLevel="-6">
+				<!-- Starts below the title strip; Chrome.lua moves it up when there is no title. -->
+				<Texture parentKey="Bg">
+					<Anchors>
+						<Anchor point="TOPLEFT" x="2" y="-21"/>
+						<Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame parentKey="NineSlice" useParentLevel="true" setAllPoints="true" inherits="NineSliceCodeTemplate"/>
+			<!-- Raised above the nine-slice in Chrome.lua, like Blizzard's TitleContainer. -->
+			<Frame parentKey="TitleContainer">
+				<Size x="0" y="20"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" x="24" y="-1"/>
+					<Anchor point="TOPRIGHT" x="-24" y="-1"/>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString parentKey="TitleText" inherits="GameFontNormal" wordwrap="false">
+							<Anchors>
+								<Anchor point="TOP" x="0" y="-5"/>
+								<Anchor point="LEFT"/>
+								<Anchor point="RIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+		</Frames>
+	</Frame>
+
+</Ui>
