@@ -164,6 +164,15 @@ local function Debug()
 		print(("  targets: %dx%d scale %.2f, shown %s, docked %s"):format(targets:GetWidth(), targets:GetHeight(),
 			targets:GetEffectiveScale(), tostring(targets:IsShown()), tostring(relativeTo == frame.CurrentStepFrame)))
 	end
+	local items = _G.RXPItemFrame
+	if items then
+		local _, relativeTo = items:GetPoint(1)
+		print(("  items: %dx%d scale %.2f, shown %s, buttons %d, docked %s"):format(items:GetWidth(), items:GetHeight(),
+			items:GetEffectiveScale(), tostring(items:IsShown()), #items.buttonList,
+			tostring(relativeTo == frame.CurrentStepFrame)))
+	else
+		print("  items: no RXPItemFrame")
+	end
 	for _, row in ipairs(frame.ScrollChild.framePool) do
 		local divider = row.RFSDivider
 		if divider and row:IsVisible() then

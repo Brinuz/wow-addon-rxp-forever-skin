@@ -10,7 +10,7 @@ Makes the **RestedXP Guides** window on **World of Warcraft: Forever** look like
 - The step list as professions list rows, spaced apart with dividers, the current step highlighted
 - Finished steps clearly marked: a checkmark, gray text and faded
 - A "Current Steps" window for the active steps and tips, with gold step titles and Blizzard check boxes
-- Active Targets docked as a row at the bottom of Current Steps, with action button art
+- Active Targets and Active Items docked side by side at the bottom of Current Steps, larger, with action button art
 - The waypoint arrow in Blizzard gold, with the step's main line between the step number and the distance
 - Blizzard's thin scroll bar and settings icon
 - A close button (same as `/rxp hide`) and a button to scroll the list back to the current step
