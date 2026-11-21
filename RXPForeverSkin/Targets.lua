@@ -150,13 +150,13 @@ local function JoinRows(frame)
 	return friendlies[1] or enemies[#enemies]
 end
 
--- Where the first row of target buttons is centered, from the frame's top.
-local function FirstRowCenter(frame)
+-- Where the first row of target buttons starts, from the frame's top.
+local function FirstRowTop(frame)
 	local enemy = frame.enemyTargetButtons[1]
 	if enemy and enemy:IsShown() then
-		return ENEMY_TOP + BUTTON_SIZE / 2
+		return ENEMY_TOP
 	end
-	return frame:GetHeight() - FRIENDLY_BOTTOM - BUTTON_SIZE / 2
+	return frame:GetHeight() - FRIENDLY_BOTTOM - BUTTON_SIZE
 end
 
 -- RestedXP may leave a frame up while it has no buttons to show.
@@ -236,15 +236,18 @@ function ns:LayoutTargets()
 	-- How far down the rows reach, from the steps' bottom.
 	local height = 0
 	local itemsX = HEADING_X
+	-- Both columns' first rows start TARGET_GAP below the steps; the
+	-- headings sit on their middle.
+	local headingY = TARGET_GAP + BUTTON_SIZE / 2 * BUTTON_SCALE
 	if showTargets then
-		PlaceHeading(targetsHeading, steps, targetFrame.title.text:GetText(), HEADING_X,
-			TARGET_GAP + FirstRowCenter(targetFrame) * BUTTON_SCALE)
+		PlaceHeading(targetsHeading, steps, targetFrame.title.text:GetText(), HEADING_X, headingY)
 		local buttonsLeft = HEADING_X + targetsHeading:GetUnboundedStringWidth() + HEADING_PADDING
-		PlaceFrame(targetFrame, steps, buttonsLeft, TARGET_GAP, BUTTON_INSET, 0)
+		local rowTop = FirstRowTop(targetFrame)
+		PlaceFrame(targetFrame, steps, buttonsLeft, TARGET_GAP, BUTTON_INSET, rowTop)
 		local lowest = JoinRows(targetFrame)
 		local top, bottom = targetFrame:GetTop(), lowest and lowest:GetBottom()
 		if top and bottom then
-			height = TARGET_GAP + (top - bottom) * BUTTON_SCALE
+			height = TARGET_GAP + (top - rowTop - bottom) * BUTTON_SCALE
 		end
 		if showItems and steps:GetLeft() then
 			local targetsRight = math.max(RightEdge(steps, enemies), RightEdge(steps, friendlies))
@@ -252,8 +255,7 @@ function ns:LayoutTargets()
 		end
 	end
 	if showItems then
-		PlaceHeading(itemsHeading, steps, itemFrame.title.text:GetText(), itemsX,
-			TARGET_GAP + BUTTON_SIZE / 2 * BUTTON_SCALE)
+		PlaceHeading(itemsHeading, steps, itemFrame.title.text:GetText(), itemsX, headingY)
 		local buttonsLeft = itemsX + itemsHeading:GetUnboundedStringWidth() + HEADING_PADDING
 		-- RestedXP lines its item buttons up along the frame's bottom.
 		local topInset = itemFrame:GetHeight() - ITEM_BOTTOM - BUTTON_SIZE
